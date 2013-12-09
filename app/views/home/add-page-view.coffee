@@ -30,15 +30,9 @@ module.exports = class AddView extends View
 
 		console.log "categorie", categories
 
-		view = new CategoriesView
+		categoriesView = new CategoriesView
 			collection: categories
+		categories.fetch().then => categoriesView.render()
 
-
-		categories.fetch().then => view.render()
-
-
-		# console.log @model
-		# categoriesView = new CategoriesView
-		# 	collection: null 
-		# categoriesView.setParent(@)
-		# @subview "category-collection", categoriesView
+	# When the user hits submit, add the record to the data store.
+	# Do the view portion
