@@ -8,3 +8,4 @@ module.exports = class Categories extends Collection
   parse:(response)->
   	console.log "response", response
   	response.data
+

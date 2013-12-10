@@ -109,7 +109,7 @@ module.exports = Application = (function(_super) {
 });
 
 ;require.register("controllers/add-controller", function(exports, require, module) {
-var AddController, AddPageView, Controller, HeaderView, _ref,
+var AddController, AddPageView, Controller, HeaderView, TransactionModel, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -118,6 +118,8 @@ Controller = require('controllers/base/controller');
 HeaderView = require('views/home/header-view');
 
 AddPageView = require('views/home/add-page-view');
+
+TransactionModel = require('models/transaction');
 
 module.exports = AddController = (function(_super) {
   __extends(AddController, _super);
@@ -136,7 +138,8 @@ module.exports = AddController = (function(_super) {
 
   AddController.prototype.index = function() {
     return this.view = new AddPageView({
-      region: 'main'
+      region: 'main',
+      model: new TransactionModel
     });
   };
 
@@ -382,6 +385,32 @@ module.exports = Transaction = (function(_super) {
 })(Model);
 });
 
+;require.register("models/transactions", function(exports, require, module) {
+var Collection, Transaction, Transactions, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+Collection = require('/models/base/collection');
+
+Transaction = require('/models/transaction');
+
+module.exports = Transactions = (function(_super) {
+  __extends(Transactions, _super);
+
+  function Transactions() {
+    _ref = Transactions.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  Transactions.prototype.model = Transaction;
+
+  Transactions.prototype.localStorage = new Backbone.LocalStorage('transactions-list');
+
+  return Transactions;
+
+})(Collection);
+});
+
 ;require.register("routes", function(exports, require, module) {
 module.exports = function(match) {
   match('', 'home#index');
@@ -517,15 +546,15 @@ module.exports = AddView = (function(_super) {
   };
 
   AddView.prototype.renderSubviews = function() {
-    var categories, view,
+    var categories, categoriesView,
       _this = this;
     categories = new Categories;
     console.log("categorie", categories);
-    view = new CategoriesView({
+    categoriesView = new CategoriesView({
       collection: categories
     });
     return categories.fetch().then(function() {
-      return view.render();
+      return categoriesView.render();
     });
   };
 
@@ -660,7 +689,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div>I am the add view</div>\n\n<form onSubmit=\"return false;\">\n<div>\n	<label for=\"amount\">Amount</label>\n	<input name=\"amount\" type=\"text\"></input>\n</div>\n\n<div>\n	<label for=\"description\">Description</label>\n	<input name=\"description\" type=\"text\"></input>\n</div>\n\n<div class=\"category-container\">\n	<label for=\"category\">Category</label>\n</div>\n	<input type=\"submit\" value=\"Add\"/>\n</form>";
+  return "<div>I am the add view</div>\n\n<form onSubmit=\"return false;\">\n<div>\n	<label for=\"amount\">Amount</label>\n	<input name=\"amount\" type=\"text\"></input>\n</div>\n\n<div>\n	<label for=\"description\">Description</label>\n	<input name=\"description\" type=\"text\"></input>\n</div>\n\n<div class=\"category-container\">\n	<label for=\"category\">Category</label>\n</div>\n	<input type=\"submit\" value=\"Add\"/>\n</form>\n";
   });
 if (typeof define === 'function' && define.amd) {
   define([], function() {
