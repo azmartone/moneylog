@@ -1,9 +1,9 @@
 Controller = require 'controllers/base/controller'
 HeaderView = require 'views/home/header-view'
-AddPageView = require 'views/home/add-page-view'
+GraphPageView = require 'views/home/graph-page-view'
 Transactions = require 'models/transactions'
 
-module.exports = class AddController extends Controller
+module.exports = class GraphController extends Controller
 	beforeAction: ->
 		super
 
@@ -14,6 +14,6 @@ module.exports = class AddController extends Controller
 			region: 'header'
 
 	index: ->
-		@view = new AddPageView 
+		@view = new GraphPageView 
 			region: 'main'
 			collection: new Transactions

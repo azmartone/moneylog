@@ -1,6 +1,7 @@
 module.exports = (match) ->
   match '', 'home#index'
   match 'add', 'add#index'
+  match 'graph', 'graph#index'
 
 # module.exports = (match) ->
 

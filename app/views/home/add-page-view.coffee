@@ -1,6 +1,6 @@
 CollectionView = require 'views/base/collection-view'
 CategoriesView = require 'views/home/categories-view'
-TransactionView = require 'views/home/transaction-view'
+AddPageTransactionView = require 'views/home/add-page-transaction-view'
 Categories = require 'models/categories'
 Transaction = require 'models/transaction'
 
@@ -9,7 +9,7 @@ module.exports = class AddView extends CollectionView
 	autoRender: true
 	className: 'add-container'
 	template: require './templates/add'
-	itemView: TransactionView
+	itemView: AddPageTransactionView
 
 	render: () ->
 		super

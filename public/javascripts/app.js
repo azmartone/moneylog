@@ -109,7 +109,7 @@ module.exports = Application = (function(_super) {
 });
 
 ;require.register("controllers/add-controller", function(exports, require, module) {
-var AddController, AddPageView, Controller, HeaderView, TransactionModel, _ref,
+var AddController, AddPageView, Controller, HeaderView, Transactions, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -119,9 +119,7 @@ HeaderView = require('views/home/header-view');
 
 AddPageView = require('views/home/add-page-view');
 
-TransactionModel = require('models/transaction');
-
-TransactionModel = require('models/transactions');
+Transactions = require('models/transactions');
 
 module.exports = AddController = (function(_super) {
   __extends(AddController, _super);
@@ -141,7 +139,7 @@ module.exports = AddController = (function(_super) {
   AddController.prototype.index = function() {
     return this.view = new AddPageView({
       region: 'main',
-      collection: new TransactionModel
+      collection: new Transactions
     });
   };
 
@@ -172,6 +170,46 @@ module.exports = Controller = (function(_super) {
   return Controller;
 
 })(Chaplin.Controller);
+});
+
+;require.register("controllers/graph-controller", function(exports, require, module) {
+var Controller, GraphController, GraphPageView, HeaderView, Transactions, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+Controller = require('controllers/base/controller');
+
+HeaderView = require('views/home/header-view');
+
+GraphPageView = require('views/home/graph-page-view');
+
+Transactions = require('models/transactions');
+
+module.exports = GraphController = (function(_super) {
+  __extends(GraphController, _super);
+
+  function GraphController() {
+    _ref = GraphController.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  GraphController.prototype.beforeAction = function() {
+    GraphController.__super__.beforeAction.apply(this, arguments);
+    return this.compose('header', HeaderView, {
+      region: 'header'
+    });
+  };
+
+  GraphController.prototype.index = function() {
+    return this.view = new GraphPageView({
+      region: 'main',
+      collection: new Transactions
+    });
+  };
+
+  return GraphController;
+
+})(Controller);
 });
 
 ;require.register("controllers/home-controller", function(exports, require, module) {
@@ -220,7 +258,7 @@ routes = require('routes');
 
 $(function() {
   return new Application({
-    title: 'Brunch example application',
+    title: 'Money Log',
     controllerSuffix: '-controller',
     routes: routes
   });
@@ -416,7 +454,8 @@ module.exports = Transactions = (function(_super) {
 ;require.register("routes", function(exports, require, module) {
 module.exports = function(match) {
   match('', 'home#index');
-  return match('add', 'add#index');
+  match('add', 'add#index');
+  return match('graph', 'graph#index');
 };
 });
 
@@ -468,8 +507,32 @@ module.exports = View = (function(_super) {
 })(Chaplin.View);
 });
 
+;require.register("views/home/add-page-transaction-view", function(exports, require, module) {
+var AddPageTransactionView, View, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+View = require('views/base/view');
+
+module.exports = AddPageTransactionView = (function(_super) {
+  __extends(AddPageTransactionView, _super);
+
+  function AddPageTransactionView() {
+    _ref = AddPageTransactionView.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  AddPageTransactionView.prototype.autoRender = false;
+
+  AddPageTransactionView.prototype.className = 'add-page-transaction';
+
+  return AddPageTransactionView;
+
+})(View);
+});
+
 ;require.register("views/home/add-page-view", function(exports, require, module) {
-var AddView, Categories, CategoriesView, CollectionView, Transaction, TransactionView, _ref,
+var AddPageTransactionView, AddView, Categories, CategoriesView, CollectionView, Transaction, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -477,7 +540,7 @@ CollectionView = require('views/base/collection-view');
 
 CategoriesView = require('views/home/categories-view');
 
-TransactionView = require('views/home/transaction-view');
+AddPageTransactionView = require('views/home/add-page-transaction-view');
 
 Categories = require('models/categories');
 
@@ -497,7 +560,7 @@ module.exports = AddView = (function(_super) {
 
   AddView.prototype.template = require('./templates/add');
 
-  AddView.prototype.itemView = TransactionView;
+  AddView.prototype.itemView = AddPageTransactionView;
 
   AddView.prototype.render = function() {
     return AddView.__super__.render.apply(this, arguments);
@@ -638,6 +701,79 @@ module.exports = CategoryView = (function(_super) {
 })(View);
 });
 
+;require.register("views/home/graph-page-view", function(exports, require, module) {
+var Categories, CategoriesView, CollectionView, GraphPageView, GraphTransactionView, Transaction, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+CollectionView = require('views/base/collection-view');
+
+CategoriesView = require('views/home/categories-view');
+
+GraphTransactionView = require('views/home/graph-transaction-view');
+
+Categories = require('models/categories');
+
+Transaction = require('models/transaction');
+
+module.exports = GraphPageView = (function(_super) {
+  __extends(GraphPageView, _super);
+
+  function GraphPageView() {
+    _ref = GraphPageView.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  GraphPageView.prototype.autoRender = true;
+
+  GraphPageView.prototype.className = 'transactions-container';
+
+  GraphPageView.prototype.template = require('./templates/graph');
+
+  GraphPageView.prototype.itemView = GraphTransactionView;
+
+  GraphPageView.prototype.render = function() {
+    return GraphPageView.__super__.render.apply(this, arguments);
+  };
+
+  GraphPageView.prototype.attach = function() {
+    this.renderSubviews();
+    return GraphPageView.__super__.attach.apply(this, arguments);
+  };
+
+  GraphPageView.prototype.renderSubviews = function() {
+    return console.log("Show me shiet", this.collection);
+  };
+
+  return GraphPageView;
+
+})(CollectionView);
+});
+
+;require.register("views/home/graph-transaction-view", function(exports, require, module) {
+var GraphTransactionView, View, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+View = require('views/base/view');
+
+module.exports = GraphTransactionView = (function(_super) {
+  __extends(GraphTransactionView, _super);
+
+  function GraphTransactionView() {
+    _ref = GraphTransactionView.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  GraphTransactionView.prototype.autoRender = false;
+
+  GraphTransactionView.prototype.className = 'transaction';
+
+  return GraphTransactionView;
+
+})(View);
+});
+
 ;require.register("views/home/header-view", function(exports, require, module) {
 var HeaderView, View, _ref,
   __hasProp = {}.hasOwnProperty,
@@ -734,6 +870,26 @@ if (typeof define === 'function' && define.amd) {
 }
 });
 
+;require.register("views/home/templates/graph", function(exports, require, module) {
+var __templateData = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<div>I am the Graph View</div>\n";
+  });
+if (typeof define === 'function' && define.amd) {
+  define([], function() {
+    return __templateData;
+  });
+} else if (typeof module === 'object' && module && module.exports) {
+  module.exports = __templateData;
+} else {
+  __templateData;
+}
+});
+
 ;require.register("views/home/templates/header", function(exports, require, module) {
 var __templateData = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
@@ -741,7 +897,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return " <ul>\n  <li><a class=\"header-link\" href=\"add\">Add</a></li>\n  <li><a class=\"header-link\" href=\"view\">View</a></li>\n</ul>\n";
+  return " <ul>\n  <li><a class=\"header-link\" href=\"add\">Add</a></li>\n  <li><a class=\"header-link\" href=\"graph\">Graph</a></li>\n</ul>\n";
   });
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -772,30 +928,6 @@ if (typeof define === 'function' && define.amd) {
 } else {
   __templateData;
 }
-});
-
-;require.register("views/home/transaction-view", function(exports, require, module) {
-var TransactionView, View, _ref,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-View = require('views/base/view');
-
-module.exports = TransactionView = (function(_super) {
-  __extends(TransactionView, _super);
-
-  function TransactionView() {
-    _ref = TransactionView.__super__.constructor.apply(this, arguments);
-    return _ref;
-  }
-
-  TransactionView.prototype.autoRender = false;
-
-  TransactionView.prototype.className = 'transaction';
-
-  return TransactionView;
-
-})(View);
 });
 
 ;require.register("views/site-view", function(exports, require, module) {
@@ -847,28 +979,6 @@ if (typeof define === 'function' && define.amd) {
 } else {
   __templateData;
 }
-});
-
-;require.register("views/transaction-view", function(exports, require, module) {
-var TransactionView, View, _ref,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-View = require('views/base/view');
-
-module.exports = TransactionView = (function(_super) {
-  __extends(TransactionView, _super);
-
-  function TransactionView() {
-    _ref = TransactionView.__super__.constructor.apply(this, arguments);
-    return _ref;
-  }
-
-  TransactionView.prototype.template = require('./templates/transaction');
-
-  return TransactionView;
-
-})(View);
 });
 
 ;
