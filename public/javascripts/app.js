@@ -121,6 +121,8 @@ AddPageView = require('views/home/add-page-view');
 
 TransactionModel = require('models/transaction');
 
+TransactionModel = require('models/transactions');
+
 module.exports = AddController = (function(_super) {
   __extends(AddController, _super);
 
@@ -139,7 +141,7 @@ module.exports = AddController = (function(_super) {
   AddController.prototype.index = function() {
     return this.view = new AddPageView({
       region: 'main',
-      model: new TransactionModel
+      collection: new TransactionModel
     });
   };
 
@@ -418,42 +420,6 @@ module.exports = function(match) {
 };
 });
 
-;require.register("views/add", function(exports, require, module) {
-var AddView, CollectionView, GameEventView, TabsView, _ref,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-CollectionView = require('views/base/view');
-
-GameEventView = require('./game-event-view');
-
-TabsView = require('./tabs-view');
-
-module.exports = AddView = (function(_super) {
-  __extends(AddView, _super);
-
-  function AddView() {
-    _ref = AddView.__super__.constructor.apply(this, arguments);
-    return _ref;
-  }
-
-  AddView.prototype.className = 'add-container';
-
-  AddView.prototype.template = require('./templates/add');
-
-  AddView.prototype.initialize = function() {
-    return AddView.__super__.initialize.apply(this, arguments);
-  };
-
-  AddView.prototype.attach = function() {
-    return AddView.__super__.attach.apply(this, arguments);
-  };
-
-  return AddView;
-
-})(View);
-});
-
 ;require.register("views/base/collection-view", function(exports, require, module) {
 var CollectionView, View, _ref,
   __hasProp = {}.hasOwnProperty,
@@ -503,15 +469,17 @@ module.exports = View = (function(_super) {
 });
 
 ;require.register("views/home/add-page-view", function(exports, require, module) {
-var AddView, Categories, CategoriesView, View, _ref,
+var AddView, Categories, CategoriesView, CollectionView, Transaction, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-View = require('views/base/view');
+CollectionView = require('views/base/collection-view');
 
 CategoriesView = require('views/home/categories-view');
 
 Categories = require('models/categories');
+
+Transaction = require('models/transaction');
 
 module.exports = AddView = (function(_super) {
   __extends(AddView, _super);
@@ -527,12 +495,7 @@ module.exports = AddView = (function(_super) {
 
   AddView.prototype.template = require('./templates/add');
 
-  AddView.prototype.initialize = function() {
-    return AddView.__super__.initialize.apply(this, arguments);
-  };
-
   AddView.prototype.render = function() {
-    this.delegate('click', 'input[type=submit]', this.addNew);
     return AddView.__super__.render.apply(this, arguments);
   };
 
@@ -542,29 +505,59 @@ module.exports = AddView = (function(_super) {
   };
 
   AddView.prototype.addNew = function() {
-    return console.log("trying to addNew");
+    var model;
+    console.log(this.amount);
+    console.log(this.amount.val());
+    console.log(this.description.val());
+    if (this.amount.val().length > 0 && this.description.val().length > 0) {
+      model = new Transaction({
+        amount: this.amount.val(),
+        description: this.description.val(),
+        category: this.categoriesView.selected
+      });
+      console.log('added model', model);
+      return console.log(this.collection);
+    } else {
+
+    }
   };
 
   AddView.prototype.renderSubviews = function() {
-    var categories, categoriesView,
+    var amountSelector, categories, descriptionSelector,
       _this = this;
+    amountSelector = 'input[name=amount]';
+    descriptionSelector = 'input[name=description]';
+    this.amount = $(amountSelector);
+    this.description = $(descriptionSelector);
+    this.delegate('click', 'input[type=submit]', this.addNew);
+    this.delegate('change', amountSelector, this.onAmountChange);
+    this.delegate('change', descriptionSelector, this.onDescriptionChange);
     categories = new Categories;
     console.log("categorie", categories);
-    categoriesView = new CategoriesView({
+    this.categoriesView = new CategoriesView({
       collection: categories
     });
     return categories.fetch().then(function() {
-      return categoriesView.render();
+      return _this.categoriesView.render();
     });
+  };
+
+  AddView.prototype.onAmountChange = function() {
+    return console.log('amount changed');
+  };
+
+  AddView.prototype.onDescriptionChange = function() {
+    return console.log('description changed');
   };
 
   return AddView;
 
-})(View);
+})(CollectionView);
 });
 
 ;require.register("views/home/categories-view", function(exports, require, module) {
 var CategoriesView, CategoryView, CollectionView, _ref,
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -576,6 +569,7 @@ module.exports = CategoriesView = (function(_super) {
   __extends(CategoriesView, _super);
 
   function CategoriesView() {
+    this.onChange = __bind(this.onChange, this);
     _ref = CategoriesView.__super__.constructor.apply(this, arguments);
     return _ref;
   }
@@ -589,6 +583,16 @@ module.exports = CategoriesView = (function(_super) {
   CategoriesView.prototype.tagName = 'select';
 
   CategoriesView.prototype.container = '.category-container';
+
+  CategoriesView.prototype.attach = function() {
+    this.selected = $(this.el).val();
+    this.delegate('change', this.onChange);
+    return CategoriesView.__super__.attach.apply(this, arguments);
+  };
+
+  CategoriesView.prototype.onChange = function() {
+    return this.selected = $(this.el).val();
+  };
 
   return CategoriesView;
 

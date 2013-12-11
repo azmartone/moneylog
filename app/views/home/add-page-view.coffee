@@ -1,18 +1,15 @@
-View = require 'views/base/view'
+CollectionView = require 'views/base/collection-view'
 CategoriesView = require 'views/home/categories-view'
 Categories = require 'models/categories'
+Transaction = require 'models/transaction'
 
-module.exports = class AddView extends View
+module.exports = class AddView extends CollectionView
 
 	autoRender: true
 	className: 'add-container'
 	template: require './templates/add'
 
-	initialize: () ->
-		super
-
 	render: () ->
-		@delegate('click', 'input[type=submit]', @addNew)
 		super
 
 	attach: () ->
@@ -20,19 +17,44 @@ module.exports = class AddView extends View
 		@renderSubviews()
 
 	addNew:()->
-		console.log "trying to addNew"
-		#Adds to the collection of transactions
+		console.log @amount
+		console.log @amount.val()
+		console.log @description.val()
+		if @amount.val().length > 0 and @description.val().length > 0
+			model = new Transaction
+				amount: @amount.val()
+				description: @description.val()
+				category: @categoriesView.selected
+			console.log 'added model', model
+			# @collection.add model
+
+			console.log @collection
+			#Add model to collection
+		else
+			#Fill in all fields
 
 
 	renderSubviews: () ->
+
+		amountSelector = 'input[name=amount]'
+		descriptionSelector = 'input[name=description]'
+		@amount = $(amountSelector)
+		@description = $(descriptionSelector)
+
+		@delegate('click', 'input[type=submit]', @addNew)
+		@delegate('change', amountSelector, @onAmountChange)
+		@delegate('change', descriptionSelector, @onDescriptionChange)
 
 		categories = new Categories
 
 		console.log "categorie", categories
 
-		categoriesView = new CategoriesView
+		@categoriesView = new CategoriesView
 			collection: categories
-		categories.fetch().then => categoriesView.render()
+		categories.fetch().then => @categoriesView.render()
 
-	# When the user hits submit, add the record to the data store.
-	# Do the view portion
+	onAmountChange: () ->
+		console.log 'amount changed'
+
+	onDescriptionChange: () ->
+		console.log 'description changed'

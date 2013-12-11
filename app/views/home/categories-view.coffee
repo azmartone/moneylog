@@ -7,3 +7,11 @@ module.exports = class CategoriesView extends CollectionView
 	itemView: CategoryView
 	tagName: 'select'
 	container: '.category-container'
+
+	attach:()->
+		@selected = $(@el).val()
+		@delegate 'change', @onChange
+		super
+
+	onChange:()=>
+		@selected = $(@el).val()

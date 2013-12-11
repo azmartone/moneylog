@@ -2,6 +2,7 @@ Controller = require 'controllers/base/controller'
 HeaderView = require 'views/home/header-view'
 AddPageView = require 'views/home/add-page-view'
 TransactionModel = require 'models/transaction'
+TransactionModel = require 'models/transactions'
 
 module.exports = class AddController extends Controller
 	beforeAction: ->
@@ -16,4 +17,4 @@ module.exports = class AddController extends Controller
 	index: ->
 		@view = new AddPageView 
 			region: 'main'
-			model: new TransactionModel
+			collection: new TransactionModel
