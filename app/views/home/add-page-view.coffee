@@ -1,5 +1,6 @@
 CollectionView = require 'views/base/collection-view'
 CategoriesView = require 'views/home/categories-view'
+TransactionView = require 'views/home/transaction-view'
 Categories = require 'models/categories'
 Transaction = require 'models/transaction'
 
@@ -8,6 +9,7 @@ module.exports = class AddView extends CollectionView
 	autoRender: true
 	className: 'add-container'
 	template: require './templates/add'
+	itemView: TransactionView
 
 	render: () ->
 		super
@@ -26,12 +28,12 @@ module.exports = class AddView extends CollectionView
 				description: @description.val()
 				category: @categoriesView.selected
 			console.log 'added model', model
-			# @collection.add model
+			@collection.add model
 
 			console.log @collection
-			#Add model to collection
+			model.save()
 		else
-			#Fill in all fields
+			alert 'Fill in your fields'
 
 
 	renderSubviews: () ->

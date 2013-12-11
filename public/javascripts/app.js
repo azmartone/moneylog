@@ -469,13 +469,15 @@ module.exports = View = (function(_super) {
 });
 
 ;require.register("views/home/add-page-view", function(exports, require, module) {
-var AddView, Categories, CategoriesView, CollectionView, Transaction, _ref,
+var AddView, Categories, CategoriesView, CollectionView, Transaction, TransactionView, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 CollectionView = require('views/base/collection-view');
 
 CategoriesView = require('views/home/categories-view');
+
+TransactionView = require('views/home/transaction-view');
 
 Categories = require('models/categories');
 
@@ -494,6 +496,8 @@ module.exports = AddView = (function(_super) {
   AddView.prototype.className = 'add-container';
 
   AddView.prototype.template = require('./templates/add');
+
+  AddView.prototype.itemView = TransactionView;
 
   AddView.prototype.render = function() {
     return AddView.__super__.render.apply(this, arguments);
@@ -516,9 +520,11 @@ module.exports = AddView = (function(_super) {
         category: this.categoriesView.selected
       });
       console.log('added model', model);
-      return console.log(this.collection);
+      this.collection.add(model);
+      console.log(this.collection);
+      return model.save();
     } else {
-
+      return alert('Fill in your fields');
     }
   };
 
@@ -766,6 +772,30 @@ if (typeof define === 'function' && define.amd) {
 } else {
   __templateData;
 }
+});
+
+;require.register("views/home/transaction-view", function(exports, require, module) {
+var TransactionView, View, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+View = require('views/base/view');
+
+module.exports = TransactionView = (function(_super) {
+  __extends(TransactionView, _super);
+
+  function TransactionView() {
+    _ref = TransactionView.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  TransactionView.prototype.autoRender = false;
+
+  TransactionView.prototype.className = 'transaction';
+
+  return TransactionView;
+
+})(View);
 });
 
 ;require.register("views/site-view", function(exports, require, module) {
