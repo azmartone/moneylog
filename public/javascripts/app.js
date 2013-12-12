@@ -195,6 +195,8 @@ module.exports = GraphController = (function(_super) {
 
   GraphController.prototype.beforeAction = function() {
     GraphController.__super__.beforeAction.apply(this, arguments);
+    this.transactions = new Transactions;
+    this.transactions.fetch();
     return this.compose('header', HeaderView, {
       region: 'header'
     });
@@ -203,7 +205,7 @@ module.exports = GraphController = (function(_super) {
   GraphController.prototype.index = function() {
     return this.view = new GraphPageView({
       region: 'main',
-      collection: new Transactions
+      collection: this.transactions
     });
   };
 
@@ -702,19 +704,13 @@ module.exports = CategoryView = (function(_super) {
 });
 
 ;require.register("views/home/graph-page-view", function(exports, require, module) {
-var Categories, CategoriesView, CollectionView, GraphPageView, GraphTransactionView, Transaction, _ref,
+var CollectionView, GraphPageView, GraphTransactionView, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 CollectionView = require('views/base/collection-view');
 
-CategoriesView = require('views/home/categories-view');
-
 GraphTransactionView = require('views/home/graph-transaction-view');
-
-Categories = require('models/categories');
-
-Transaction = require('models/transaction');
 
 module.exports = GraphPageView = (function(_super) {
   __extends(GraphPageView, _super);
@@ -742,7 +738,23 @@ module.exports = GraphPageView = (function(_super) {
   };
 
   GraphPageView.prototype.renderSubviews = function() {
-    return console.log("Show me shiet", this.collection);
+    return console.log(this.getTotalsByCategory());
+  };
+
+  GraphPageView.prototype.getTotalsByCategory = function() {
+    var category, totals, transaction, transactions, _i, _len;
+    transactions = this.collection.models;
+    totals = {};
+    for (_i = 0, _len = transactions.length; _i < _len; _i++) {
+      transaction = transactions[_i];
+      category = transaction.get('category');
+      if (totals.hasOwnProperty(category)) {
+        totals[category] += parseFloat(transaction.get('amount'));
+      } else {
+        totals[category] = parseFloat(transaction.get('amount'));
+      }
+    }
+    return totals;
   };
 
   return GraphPageView;

@@ -5,3 +5,4 @@ module.exports = class Transactions extends Collection
 
   model: Transaction
   localStorage: new Backbone.LocalStorage 'transactions-list'
+

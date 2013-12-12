@@ -7,9 +7,6 @@ module.exports = class AddController extends Controller
 	beforeAction: ->
 		super
 
-		# @model = new Model
-		# @model.fetch()
-
 		@compose 'header', HeaderView, 
 			region: 'header'
 

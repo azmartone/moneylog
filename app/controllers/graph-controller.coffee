@@ -7,8 +7,8 @@ module.exports = class GraphController extends Controller
 	beforeAction: ->
 		super
 
-		# @model = new Model
-		# @model.fetch()
+		@transactions = new Transactions
+		@transactions.fetch()
 
 		@compose 'header', HeaderView, 
 			region: 'header'
@@ -16,4 +16,4 @@ module.exports = class GraphController extends Controller
 	index: ->
 		@view = new GraphPageView 
 			region: 'main'
-			collection: new Transactions
+			collection: @transactions

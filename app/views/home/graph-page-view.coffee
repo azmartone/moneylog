@@ -1,8 +1,5 @@
 CollectionView = require 'views/base/collection-view'
-CategoriesView = require 'views/home/categories-view'
 GraphTransactionView = require 'views/home/graph-transaction-view'
-Categories = require 'models/categories'
-Transaction = require 'models/transaction'
 
 module.exports = class GraphPageView extends CollectionView
 
@@ -19,4 +16,15 @@ module.exports = class GraphPageView extends CollectionView
 		super
 
 	renderSubviews: () ->
-		console.log "Show me shiet", @collection
+		console.log @getTotalsByCategory()
+
+	getTotalsByCategory: ()->
+		transactions = @collection.models
+		totals = {}
+		for transaction in transactions
+			category = transaction.get 'category'
+			if totals.hasOwnProperty category
+				totals[category] += parseFloat transaction.get 'amount'
+			else
+				totals[category] = parseFloat transaction.get 'amount'
+		totals
