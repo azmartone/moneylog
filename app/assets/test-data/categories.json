@@ -2,14 +2,12 @@
     "sucess": true,
     "refreshTime": 0,
     "data": [
-			{
-				"title": "Miscellaneous"
-			},
-			{
-				"title": "Travel"
-			},
-			{
-				"title": "Food"
-			}
-		]
+	    {"title":"Restaurants"},
+	    {"title":"Groceries"},
+	    {"title":"Work Expenses"},
+	    {"title":"Entertainment"},
+	    {"title":"Paycheques"},
+	    {"title":"Rent"},
+	    {"title":"Utilities"}
+    ]
 }
