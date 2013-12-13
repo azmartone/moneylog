@@ -722,9 +722,9 @@ module.exports = GraphPageView = (function(_super) {
 
   GraphPageView.prototype.autoRender = true;
 
-  GraphPageView.prototype.className = 'transactions-container';
+  GraphPageView.prototype.renderItems = false;
 
-  GraphPageView.prototype.template = require('./templates/graph');
+  GraphPageView.prototype.className = 'transactions-container';
 
   GraphPageView.prototype.itemView = GraphTransactionView;
 
@@ -733,28 +733,97 @@ module.exports = GraphPageView = (function(_super) {
   };
 
   GraphPageView.prototype.attach = function() {
-    this.renderSubviews();
-    return GraphPageView.__super__.attach.apply(this, arguments);
+    GraphPageView.__super__.attach.apply(this, arguments);
+    return this.renderSubviews();
   };
 
   GraphPageView.prototype.renderSubviews = function() {
-    return console.log(this.getTotalsByCategory());
+    var classSelector, data;
+    classSelector = "." + (this.$el.attr('class'));
+    data = [this.getTotalsByCategory()];
+    return this.renderD3(classSelector, data);
   };
 
   GraphPageView.prototype.getTotalsByCategory = function() {
-    var category, totals, transaction, transactions, _i, _len;
+    var category, categoryExists, total, totals, transaction, transactions, _i, _j, _len, _len1;
     transactions = this.collection.models;
-    totals = {};
+    totals = [];
     for (_i = 0, _len = transactions.length; _i < _len; _i++) {
       transaction = transactions[_i];
       category = transaction.get('category');
-      if (totals.hasOwnProperty(category)) {
-        totals[category] += parseFloat(transaction.get('amount'));
-      } else {
-        totals[category] = parseFloat(transaction.get('amount'));
+      categoryExists = false;
+      for (_j = 0, _len1 = totals.length; _j < _len1; _j++) {
+        total = totals[_j];
+        if (total.category === category) {
+          categoryExists = true;
+          total.amount += parseFloat(transaction.get('amount'));
+          break;
+        }
+      }
+      if (!categoryExists) {
+        total = {
+          amount: parseFloat(transaction.get('amount')),
+          category: category
+        };
+        totals.push(total);
       }
     }
     return totals;
+  };
+
+  GraphPageView.prototype.renderD3 = function(selector, data) {
+    var axis, barGroup, barHeight, cheight, cmargin, cpadding, cspacing, cwidth, leagueBG, leagueGroup, leagueLabel, maxAmount, numericAxisGroup, perksAxis, perksAxisGroup, svg, teamNameWidth, x, y;
+    cspacing = 40;
+    cmargin = 10;
+    cpadding = 5;
+    cwidth = 1000;
+    cheight = 200;
+    maxAmount = 300;
+    barHeight = 20;
+    teamNameWidth = 100;
+    svg = d3.select(selector).append("svg").attr("class", "chart").attr("width", cwidth + teamNameWidth).attr("height", 1000);
+    leagueGroup = svg.selectAll("g").data(data).enter().append("g").attr("transform", function(d, i) {
+      return "translate(0," + ((cheight + cmargin) * i + cspacing * i) + ")";
+    });
+    leagueBG = leagueGroup.append("rect").attr("x", cmargin).attr("y", cmargin).attr("width", cwidth + teamNameWidth).attr("height", cheight - 2 * cmargin);
+    leagueLabel = leagueGroup.append("text").attr("y", cheight + 10).attr("x", cmargin).text(function(d) {
+      return d.key;
+    });
+    y = d3.scale.ordinal().domain(data).rangeBands([0, cheight]);
+    x = d3.scale.linear().domain([0, maxAmount]).range([0, cwidth]);
+    perksAxis = d3.svg.axis().scale(x).tickValues([50, 150, 250]).tickSize(0).tickPadding(0).tickFormat(function(d) {
+      return "";
+    });
+    axis = d3.svg.axis().scale(x);
+    numericAxisGroup = leagueGroup.append("g").attr("class", "axis").attr("transform", "translate(" + teamNameWidth + "," + cheight + ")").call(axis);
+    perksAxisGroup = leagueGroup.append("g").attr("class", "axis").attr("transform", "translate(" + teamNameWidth + "," + cheight + ")").call(perksAxis).selectAll("g").append("svg:foreignObject").attr("width", 100).attr("height", 50).attr("x", 30).attr("y", 15).append("xhtml:div").attr("class", "perk-label").html(function(label) {
+      switch (label) {
+        case 50:
+          label = "Did you save for this?";
+          break;
+        case 150:
+          label = "Hey Big Spender";
+          break;
+        case 250:
+          label = "I'm alerting the Mrs.";
+      }
+      return label;
+    });
+    barGroup = leagueGroup.selectAll("team").data(function(d) {
+      return d;
+    }).enter().append("g").attr("transform", function(d, i) {
+      return "translate(" + teamNameWidth + "," + (cmargin + cpadding + i * (barHeight + 1)) + ")";
+    });
+    barGroup.append("text").attr("class", "title").text(function(d) {
+      return d.category;
+    }).style("text-anchor", "end").attr("transform", "translate(-6," + barHeight * 2 / 3 + ")");
+    return barGroup.append("rect").attr("class", "bar").attr("height", barHeight).attr("width", 0).transition().duration(1000).delay(function(d, i) {
+      return i * 100;
+    }).attr("width", function(d) {
+      var amount;
+      amount = d.amount > 0 ? d.amount : 0;
+      return x(amount);
+    });
   };
 
   return GraphPageView;

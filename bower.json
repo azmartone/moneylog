@@ -9,7 +9,8 @@
     "jquery": "~2.0.2",
     "normalize-css": "~2.1.2",
     "h5bp-helpers": "~0.1.0",
-    "backbone.localstorage": "~1.1.7"
+    "backbone.localstorage": "~1.1.7",
+    "d3": "~3.3.11"
   },
   "overrides": {
     "backbone": {
