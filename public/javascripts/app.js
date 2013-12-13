@@ -778,7 +778,7 @@ module.exports = GraphPageView = (function(_super) {
     cpadding = 5;
     cwidth = 1000;
     cheight = 200;
-    maxAmount = 300;
+    maxAmount = 1000;
     barHeight = 20;
     teamNameWidth = 100;
     svg = d3.select(selector).append("svg").attr("class", "chart").attr("width", cwidth + teamNameWidth).attr("height", 1000);
@@ -791,20 +791,20 @@ module.exports = GraphPageView = (function(_super) {
     });
     y = d3.scale.ordinal().domain(data).rangeBands([0, cheight]);
     x = d3.scale.linear().domain([0, maxAmount]).range([0, cwidth]);
-    perksAxis = d3.svg.axis().scale(x).tickValues([50, 150, 250]).tickSize(0).tickPadding(0).tickFormat(function(d) {
+    perksAxis = d3.svg.axis().scale(x).tickValues([300, 500, 700]).tickSize(0).tickPadding(0).tickFormat(function(d) {
       return "";
     });
     axis = d3.svg.axis().scale(x);
     numericAxisGroup = leagueGroup.append("g").attr("class", "axis").attr("transform", "translate(" + teamNameWidth + "," + cheight + ")").call(axis);
-    perksAxisGroup = leagueGroup.append("g").attr("class", "axis").attr("transform", "translate(" + teamNameWidth + "," + cheight + ")").call(perksAxis).selectAll("g").append("svg:foreignObject").attr("width", 100).attr("height", 50).attr("x", 30).attr("y", 15).append("xhtml:div").attr("class", "perk-label").html(function(label) {
+    perksAxisGroup = leagueGroup.append("g").attr("class", "axis").attr("transform", "translate(" + teamNameWidth + "," + cheight + ")").call(perksAxis).selectAll("g").append("svg:foreignObject").attr("width", 100).attr("height", 50).attr("x", 0).attr("y", 25).append("xhtml:div").attr("class", "perk-label").html(function(label) {
       switch (label) {
-        case 50:
+        case 300:
           label = "Did you save for this?";
           break;
-        case 150:
+        case 500:
           label = "Hey Big Spender";
           break;
-        case 250:
+        case 700:
           label = "I'm alerting the Mrs.";
       }
       return label;

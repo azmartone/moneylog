@@ -46,7 +46,7 @@ module.exports = class GraphPageView extends CollectionView
 		cpadding = 5
 		cwidth = 1000
 		cheight = 200
-		maxAmount = 300
+		maxAmount = 1000
 		barHeight = 20
 		teamNameWidth = 100
 
@@ -63,20 +63,20 @@ module.exports = class GraphPageView extends CollectionView
 		#Functions for x and y
 		y = d3.scale.ordinal().domain(data).rangeBands([0, cheight])
 		x = d3.scale.linear().domain([0, maxAmount]).range([0, cwidth])
-		perksAxis = d3.svg.axis().scale(x).tickValues([50, 150, 250]).tickSize(0).tickPadding(0).tickFormat((d) ->
+		perksAxis = d3.svg.axis().scale(x).tickValues([300, 500, 700]).tickSize(0).tickPadding(0).tickFormat((d) ->
 			""
 		)
 		axis = d3.svg.axis().scale(x)
 
 		#Axis
 		numericAxisGroup = leagueGroup.append("g").attr("class", "axis").attr("transform", "translate(" + teamNameWidth + "," + cheight + ")").call(axis)
-		perksAxisGroup = leagueGroup.append("g").attr("class", "axis").attr("transform", "translate(" + teamNameWidth + "," + cheight + ")").call(perksAxis).selectAll("g").append("svg:foreignObject").attr("width", 100).attr("height", 50).attr("x", 30).attr("y", 15).append("xhtml:div").attr("class", "perk-label").html((label) ->
+		perksAxisGroup = leagueGroup.append("g").attr("class", "axis").attr("transform", "translate(" + teamNameWidth + "," + cheight + ")").call(perksAxis).selectAll("g").append("svg:foreignObject").attr("width", 100).attr("height", 50).attr("x", 0).attr("y", 25).append("xhtml:div").attr("class", "perk-label").html((label) ->
 			switch label
-			  when 50
+			  when 300
 			    label = "Did you save for this?"
-			  when 150
+			  when 500
 			    label = "Hey Big Spender"
-			  when 250
+			  when 700
 			    label = "I'm alerting the Mrs."
 			label
 		)
