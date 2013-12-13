@@ -1,10 +1,13 @@
 CollectionView = require 'views/base/collection-view'
+View = require 'views/base/view'
 
 module.exports = class GraphPageView extends CollectionView
 
 	autoRender: true
 	renderItems: false
 	className: 'transactions-container'
+	template: require 'views/home/templates/graph'
+	itemView: View
 
 	render: () ->
 		super

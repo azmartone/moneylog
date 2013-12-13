@@ -2,13 +2,15 @@ CollectionView = require 'views/base/collection-view'
 CategoriesView = require 'views/home/categories-view'
 Categories = require 'models/categories'
 Transaction = require 'models/transaction'
+View = require 'views/base/view'
 
 module.exports = class AddView extends CollectionView
 
 	autoRender: true
-	renderItem: false
+	renderItems: false
 	className: 'add-container'
 	template: require './templates/add'
+	itemView: View
 
 	render: () ->
 		super
@@ -17,43 +19,39 @@ module.exports = class AddView extends CollectionView
 		super
 		@renderSubviews()
 
-	addNew:()->
-		console.log @amount
-		console.log @amount.val()
-		console.log @description.val()
+	addNew:()=>
 		if @amount.val().length > 0 and @description.val().length > 0
 			model = new Transaction
 				amount: @amount.val()
 				description: @description.val()
 				category: @categoriesView.selected
-			console.log 'added model', model
 			@collection.add model
 
-			console.log @collection
 			model.save()
+			@message.html('Transaction Logged')
+			setTimeout((=>
+				@message.html('')), 1000)
+			@resetForm()
 		else
 			alert 'Fill in your fields'
 
+	resetForm: () ->
+		@amount.val('')
+		@description.val('')
 
 	renderSubviews: () ->
-
+		messageSelector = '.message-container'
 		amountSelector = 'input[name=amount]'
 		descriptionSelector = 'input[name=description]'
+
 		@amount = $(amountSelector)
+		@message = $(messageSelector)
 		@description = $(descriptionSelector)
 
 		@delegate('click', 'input[type=submit]', @addNew)
-		@delegate('change', amountSelector, @onAmountChange)
-		@delegate('change', descriptionSelector, @onDescriptionChange)
 
 		categories = new Categories
 
 		@categoriesView = new CategoriesView
 			collection: categories
 		categories.fetch().then => @categoriesView.render()
-
-	onAmountChange: () ->
-		console.log 'amount changed'
-
-	onDescriptionChange: () ->
-		console.log 'description changed'

@@ -472,7 +472,8 @@ module.exports = View = (function(_super) {
 });
 
 ;require.register("views/home/add-page-view", function(exports, require, module) {
-var AddView, Categories, CategoriesView, CollectionView, Transaction, _ref,
+var AddView, Categories, CategoriesView, CollectionView, Transaction, View, _ref,
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -484,21 +485,26 @@ Categories = require('models/categories');
 
 Transaction = require('models/transaction');
 
+View = require('views/base/view');
+
 module.exports = AddView = (function(_super) {
   __extends(AddView, _super);
 
   function AddView() {
+    this.addNew = __bind(this.addNew, this);
     _ref = AddView.__super__.constructor.apply(this, arguments);
     return _ref;
   }
 
   AddView.prototype.autoRender = true;
 
-  AddView.prototype.renderItem = false;
+  AddView.prototype.renderItems = false;
 
   AddView.prototype.className = 'add-container';
 
   AddView.prototype.template = require('./templates/add');
+
+  AddView.prototype.itemView = View;
 
   AddView.prototype.render = function() {
     return AddView.__super__.render.apply(this, arguments);
@@ -510,35 +516,41 @@ module.exports = AddView = (function(_super) {
   };
 
   AddView.prototype.addNew = function() {
-    var model;
-    console.log(this.amount);
-    console.log(this.amount.val());
-    console.log(this.description.val());
+    var model,
+      _this = this;
     if (this.amount.val().length > 0 && this.description.val().length > 0) {
       model = new Transaction({
         amount: this.amount.val(),
         description: this.description.val(),
         category: this.categoriesView.selected
       });
-      console.log('added model', model);
       this.collection.add(model);
-      console.log(this.collection);
-      return model.save();
+      model.save();
+      this.message.html('Transaction Logged');
+      setTimeout((function() {
+        return _this.message.html('');
+      }), 1000);
+      return this.resetForm();
     } else {
       return alert('Fill in your fields');
     }
   };
 
+  AddView.prototype.resetForm = function() {
+    this.amount.val('');
+    return this.description.val('');
+  };
+
   AddView.prototype.renderSubviews = function() {
-    var amountSelector, categories, descriptionSelector,
+    var amountSelector, categories, descriptionSelector, messageSelector,
       _this = this;
+    messageSelector = '.message-container';
     amountSelector = 'input[name=amount]';
     descriptionSelector = 'input[name=description]';
     this.amount = $(amountSelector);
+    this.message = $(messageSelector);
     this.description = $(descriptionSelector);
     this.delegate('click', 'input[type=submit]', this.addNew);
-    this.delegate('change', amountSelector, this.onAmountChange);
-    this.delegate('change', descriptionSelector, this.onDescriptionChange);
     categories = new Categories;
     this.categoriesView = new CategoriesView({
       collection: categories
@@ -546,14 +558,6 @@ module.exports = AddView = (function(_super) {
     return categories.fetch().then(function() {
       return _this.categoriesView.render();
     });
-  };
-
-  AddView.prototype.onAmountChange = function() {
-    return console.log('amount changed');
-  };
-
-  AddView.prototype.onDescriptionChange = function() {
-    return console.log('description changed');
   };
 
   return AddView;
@@ -638,11 +642,13 @@ module.exports = CategoryView = (function(_super) {
 });
 
 ;require.register("views/home/graph-page-view", function(exports, require, module) {
-var CollectionView, GraphPageView, _ref,
+var CollectionView, GraphPageView, View, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 CollectionView = require('views/base/collection-view');
+
+View = require('views/base/view');
 
 module.exports = GraphPageView = (function(_super) {
   __extends(GraphPageView, _super);
@@ -657,6 +663,10 @@ module.exports = GraphPageView = (function(_super) {
   GraphPageView.prototype.renderItems = false;
 
   GraphPageView.prototype.className = 'transactions-container';
+
+  GraphPageView.prototype.template = require('views/home/templates/graph');
+
+  GraphPageView.prototype.itemView = View;
 
   GraphPageView.prototype.render = function() {
     return GraphPageView.__super__.render.apply(this, arguments);
@@ -780,7 +790,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div>Log a Transaction :</div>\n\n<form onSubmit=\"return false;\">\n\n<table>\n	<tr>\n		<td><label for=\"amount\">Amount</label></td>\n		<td><input name=\"amount\" type=\"text\"></input></td>\n	</tr>\n	<tr>\n		<td><label for=\"description\">Description</label></td>\n		<td><input name=\"description\" type=\"text\"></input></td>\n	</tr>	\n	<tr>\n		<td><label for=\"category\">Category</label></td>\n		<td><span class=\"category-container\"></span></td>\n	</tr>\n</table>\n	<input type=\"submit\" value=\"Add\"/>\n</form>\n";
+  return "<div>Log a Transaction :</div>\n\n<form onSubmit=\"return false;\">\n\n<table>\n	<tr>\n		<td><label for=\"amount\">Amount</label></td>\n		<td><input name=\"amount\" type=\"text\"></input></td>\n	</tr>\n	<tr>\n		<td><label for=\"description\">Description</label></td>\n		<td><input name=\"description\" type=\"text\"></input></td>\n	</tr>	\n	<tr>\n		<td><label for=\"category\">Category</label></td>\n		<td><span class=\"category-container\"></span></td>\n	</tr>\n</table>\n	<input type=\"submit\" value=\"Add\"/>\n	<span class=\"message-container\"></span>\n</form>\n";
   });
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -822,7 +832,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div>I am the Graph View</div>\n";
+  return "<h3>Totals by Category</h3>\n";
   });
 if (typeof define === 'function' && define.amd) {
   define([], function() {
@@ -842,7 +852,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return " <ul>\n  <li><a class=\"header-link\" href=\"add\">Add</a></li>\n  <li><a class=\"header-link\" href=\"graph\">Graph</a></li>\n</ul>\n";
+  return " <ul>\n  <li><a class=\"header-link\" href=\"add\">Add</a></li>\n  <li><a class=\"header-link\" href=\"graph\">Chart</a></li>\n</ul>\n";
   });
 if (typeof define === 'function' && define.amd) {
   define([], function() {
