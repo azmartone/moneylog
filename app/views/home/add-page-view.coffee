@@ -1,15 +1,14 @@
 CollectionView = require 'views/base/collection-view'
 CategoriesView = require 'views/home/categories-view'
-AddPageTransactionView = require 'views/home/add-page-transaction-view'
 Categories = require 'models/categories'
 Transaction = require 'models/transaction'
 
 module.exports = class AddView extends CollectionView
 
 	autoRender: true
+	renderItem: false
 	className: 'add-container'
 	template: require './templates/add'
-	itemView: AddPageTransactionView
 
 	render: () ->
 		super
@@ -48,8 +47,6 @@ module.exports = class AddView extends CollectionView
 		@delegate('change', descriptionSelector, @onDescriptionChange)
 
 		categories = new Categories
-
-		console.log "categorie", categories
 
 		@categoriesView = new CategoriesView
 			collection: categories

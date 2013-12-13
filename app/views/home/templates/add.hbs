@@ -1,18 +1,20 @@
-<div>I am the add view</div>
+<div>Log a Transaction :</div>
 
 <form onSubmit="return false;">
-<div>
-	<label for="amount">Amount</label>
-	<input name="amount" type="text"></input>
-</div>
 
-<div>
-	<label for="description">Description</label>
-	<input name="description" type="text"></input>
-</div>
-
-<div class="category-container">
-	<label for="category">Category</label>
-</div>
+<table>
+	<tr>
+		<td><label for="amount">Amount</label></td>
+		<td><input name="amount" type="text"></input></td>
+	</tr>
+	<tr>
+		<td><label for="description">Description</label></td>
+		<td><input name="description" type="text"></input></td>
+	</tr>	
+	<tr>
+		<td><label for="category">Category</label></td>
+		<td><span class="category-container"></span></td>
+	</tr>
+</table>
 	<input type="submit" value="Add"/>
 </form>

@@ -7,5 +7,4 @@ module.exports = class CategoryView extends View
 	tagName: 'option'
 
 	getTemplateData: ()->
-		console.log "getTemplateData", @model.attributes
 		@model.attributes
